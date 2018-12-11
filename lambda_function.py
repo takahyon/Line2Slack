@@ -7,11 +7,17 @@ def lambda_handler(event, context):
     post_slack(body)
     return {
         'statusCode': 200,
+        # テストで日本語も使いたいためensure_asciiをFalseにして \uXXXXを回避
         'body': json.dumps(body, ensure_ascii=False)
     }
 # Lineから送られてきたメッセージを抽出するメソッド
 def get_line_message(event):
-    return event["events"][0]["message"]["text"]
+    b = event["body"]
+    try:
+        jos = json.loads(b)
+        return jos["events"][0]["message"]["text"]
+    except:
+        return b
 
 def post_slack(text):
     # ここにslack botの incoming webhook URLを入れる
